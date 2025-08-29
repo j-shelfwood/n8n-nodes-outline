@@ -37,11 +37,26 @@ jobs:
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+            - name: Lint and Build
+              run: |
+                  bun run lint
+                  bun run build
+
+            - name: Bump version
+              id: version_bump
+              run: |
+                  # Using npm version to create commit and tag
+                  NEW_TAG=$(npm version ${{ github.event.inputs.version_type }} -m "chore(release): bump version to %s")
+                  echo "NEW_TAG=$NEW_TAG" >> $GITHUB_OUTPUT
+
+            - name: Push changes
+              run: git push origin main --follow-tags
+
             - name: Setup NPM
               run: |
                   echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-            - name: Run publish script
-              run: ./publish.sh ${{ github.event.inputs.version_type }}
+            - name: Publish to npm
+              run: npm publish
               env:
                   CI: true # Add CI environment variable
