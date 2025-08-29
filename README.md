@@ -237,10 +237,9 @@ Trigger workflows based on Outline events.
 
 #### Configuration
 
-1. Add the **Outline Webhook** node to your workflow
-2. Select the events you want to listen for
-3. Copy the webhook URL
-4. In your Outline instance, go to Settings → Webhooks and add the URL
+1. Add the **Outline Webhook** node to your workflow.
+2. Select the events you want to listen for.
+3. n8n will automatically create a webhook in your Outline instance when you activate the workflow, and delete it when you deactivate it.
 
 ## Local Development
 
@@ -270,6 +269,8 @@ To test this node locally with your n8n instance:
 ## API Reference
 
 This node implements the [Outline API](https://getoutline.com/developers) endpoints. Refer to the official documentation for detailed information about request/response formats and additional parameters.
+
+The webhook creation and deletion is handled automatically by the node.
 
 ### Rate Limits
 

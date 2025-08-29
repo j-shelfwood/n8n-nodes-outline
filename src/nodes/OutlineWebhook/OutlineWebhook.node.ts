@@ -5,7 +5,9 @@ import {
 	IWebhookResponseData,
 	IDataObject,
 	NodeConnectionType,
+	IHookFunctions,
 } from 'n8n-workflow';
+import { outlineApiRequest } from '../Outline/GenericFunctions';
 
 export class OutlineWebhook implements INodeType {
 	description: INodeTypeDescription = {
@@ -14,12 +16,18 @@ export class OutlineWebhook implements INodeType {
 		icon: 'file:outline.svg',
 		group: ['trigger'],
 		version: 1,
-		description: 'Receive Outline webhook events',
+		description: 'Handles Outline webhook events',
 		defaults: {
 			name: 'Outline Webhook',
 		},
 		inputs: [],
 		outputs: [NodeConnectionType.Main],
+		credentials: [
+			{
+				name: 'outlineApi',
+				required: true,
+			},
+		],
 		webhooks: [
 			{
 				name: 'default',
@@ -28,6 +36,49 @@ export class OutlineWebhook implements INodeType {
 				path: 'webhook',
 			},
 		],
+		webhookMethods: {
+			default: {
+				async create(this: IHookFunctions): Promise<boolean> {
+					const webhookUrl = this.getNodeWebhookUrl('default');
+					const events = this.getNodeParameter('events', []) as string[];
+					if (events.length === 0) {
+						return false;
+					}
+
+					const body = {
+						url: webhookUrl,
+						name: `n8n - ${this.getWorkflow().name} - ${this.getNode().name}`,
+						events,
+					};
+
+					const response = await outlineApiRequest.call(this, 'POST', '/webhooks.create', body);
+
+					if (response.data && response.data.id) {
+						this.getWorkflowStaticData('node').webhookId = response.data.id;
+						return true;
+					}
+
+					return false;
+				},
+				async delete(this: IHookFunctions): Promise<boolean> {
+					const webhookData = this.getWorkflowStaticData('node');
+
+					if (webhookData.webhookId) {
+						const body = {
+							id: webhookData.webhookId as string,
+						};
+						try {
+							await outlineApiRequest.call(this, 'POST', '/webhooks.delete', body);
+						} catch (error) {
+							// ignore
+						}
+						delete webhookData.webhookId;
+					}
+
+					return true;
+				},
+			},
+		},
 		properties: [
 			{
 				displayName: 'Events',

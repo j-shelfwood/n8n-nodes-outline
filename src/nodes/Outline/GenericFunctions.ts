@@ -5,13 +5,14 @@ import {
 	IRequestOptions,
 	NodeApiError,
 	JsonObject,
+	IHookFunctions,
 } from 'n8n-workflow';
 
 /**
  * Make an API request to Outline
  */
 export async function outlineApiRequest(
-	this: IExecuteFunctions,
+	this: IExecuteFunctions | IHookFunctions,
 	method: IHttpRequestMethods,
 	endpoint: string,
 	body: IDataObject = {},
