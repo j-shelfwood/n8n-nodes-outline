@@ -6,7 +6,9 @@ A community node for n8n that allows you to interact with your Outline knowledge
 
 ## Features
 
-- ✅ **Full API Coverage**: Access all major Outline resources (Documents, Collections, Users, Teams)
+- ✅ **Complete API Coverage**: Access all 10 Outline resources with 70+ operations
+- ✅ **AI Agent Compatible**: All operations structured for proper AI tool calling interface
+- ✅ **Advanced Operations**: Full CRUD plus specialized operations (archive, restore, export, user management)
 - ✅ **Webhook Support**: Receive real-time events from Outline
 - ✅ **Authentication**: Secure API key authentication with built-in credential testing
 - ✅ **TypeScript**: Fully typed for better development experience
@@ -45,7 +47,7 @@ The main node for interacting with Outline's API.
 
 #### Supported Resources
 
-##### Documents
+##### Documents (15 operations)
 
 - **Create**: Create new documents
 - **Get**: Retrieve document information
@@ -53,27 +55,85 @@ The main node for interacting with Outline's API.
 - **Search**: Search for documents
 - **Update**: Update document content and metadata
 - **Delete**: Delete documents
+- **Answer Question**: AI-powered question answering for documents
+- **Archive**: Archive documents
+- **Restore**: Restore archived documents or specific revisions
+- **Duplicate**: Create copies of documents
+- **Move**: Move documents between collections
+- **Import**: Import documents from files
+- **Export**: Export documents to various formats
+- **Templatize**: Convert documents to templates
+- **Unpublish**: Unpublish documents
+- **Memberships**: List document memberships
+- **Add User**: Add user permissions to documents
+- **Remove User**: Remove user permissions from documents
 
-##### Collections
+##### Collections (12 operations)
 
 - **Create**: Create new collections
 - **Get**: Retrieve collection information
 - **List**: List all collections
 - **Update**: Update collection details
 - **Delete**: Delete collections
+- **Documents**: List documents in a collection
+- **Add User**: Add user to collection with permissions
+- **Remove User**: Remove user from collection
+- **Memberships**: List collection memberships
+- **Add Group**: Add group to collection with permissions
+- **Remove Group**: Remove group from collection
+- **Group Memberships**: List group memberships
+- **Export**: Export collection contents
+- **Export All**: Export all collections
 
-##### Users
+##### Users (2 operations)
 
 - **Get**: Get user information
 - **List**: List team users
 
-##### Teams
+##### Teams (1 operation)
 
 - **Get**: Get team information
 
-##### Auth
+##### Attachments (3 operations)
 
-- **Get Info**: Get authentication information and validate API key
+- **Create**: Upload file attachments
+- **Delete**: Remove attachments
+- **Redirect**: Get attachment download URLs
+
+##### Comments (5 operations)
+
+- **Create**: Add comments to documents
+- **Get**: Retrieve comment information
+- **List**: List comments for documents
+- **Update**: Update comment content
+- **Delete**: Remove comments
+
+##### Events (1 operation)
+
+- **List**: Retrieve audit trail and activity logs
+
+##### File Operations (4 operations)
+
+- **Get**: Retrieve file information
+- **List**: List uploaded files
+- **Delete**: Remove files
+- **Redirect**: Get file download URLs
+
+##### Groups (7 operations)
+
+- **Create**: Create user groups
+- **Get**: Retrieve group information
+- **List**: List all groups
+- **Update**: Update group details
+- **Delete**: Remove groups
+- **Add User**: Add users to groups
+- **Remove User**: Remove users from groups
+- **Memberships**: List group memberships
+
+##### Auth (2 operations)
+
+- **Info**: Get authentication information and validate API key
+- **Config**: Get authentication configuration
 
 #### Example Workflows
 
@@ -103,16 +163,48 @@ The main node for interacting with Outline's API.
 }
 ```
 
-##### List Collections
+##### Archive a Document
+
+```json
+{
+	"resource": "document",
+	"operation": "archive",
+	"documentId": "document-id-to-archive"
+}
+```
+
+##### Add User to Collection
 
 ```json
 {
 	"resource": "collection",
-	"operation": "list",
-	"additionalFields": {
-		"limit": 25,
-		"offset": 0
+	"operation": "addUser",
+	"collectionId": "collection-id",
+	"userId": "user-id",
+	"permission": "read_write"
+}
+```
+
+##### Create Comment on Document
+
+```json
+{
+	"resource": "comment",
+	"operation": "create",
+	"documentId": "document-id",
+	"data": {
+		"body": "This is a helpful comment on the document."
 	}
+}
+```
+
+##### Export Collection
+
+```json
+{
+	"resource": "collection",
+	"operation": "export",
+	"collectionId": "collection-id"
 }
 ```
 
@@ -127,11 +219,21 @@ Trigger workflows based on Outline events.
 - **documents.delete**: Document deleted
 - **documents.archive**: Document archived
 - **documents.restore**: Document restored
+- **documents.move**: Document moved
+- **documents.duplicate**: Document duplicated
 - **collections.create**: Collection created
 - **collections.update**: Collection updated
 - **collections.delete**: Collection deleted
+- **collections.move**: Collection moved
 - **users.create**: User created
 - **users.update**: User updated
+- **users.delete**: User deleted
+- **comments.create**: Comment added
+- **comments.update**: Comment updated
+- **comments.delete**: Comment deleted
+- **groups.create**: Group created
+- **groups.update**: Group updated
+- **groups.delete**: Group deleted
 
 #### Configuration
 

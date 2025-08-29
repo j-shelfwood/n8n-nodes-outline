@@ -1,7 +1,7 @@
 {
 	"name": "n8n-nodes-outline",
 	"version": "1.0.1",
-	"description": "n8n community nodes for Outline knowledge base integration",
+	"description": "n8n community nodes for Outline knowledge base integration with complete API coverage (10 resources, 70+ operations)",
 	"private": false,
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -21,7 +21,13 @@
 		"outline",
 		"knowledge-base",
 		"documentation",
-		"notes"
+		"notes",
+		"ai-agent",
+		"automation",
+		"api",
+		"cms",
+		"wiki",
+		"collaboration"
 	],
 	"author": "j-shelfwood",
 	"license": "MIT",
@@ -33,7 +39,11 @@
 		"format": "prettier --write .",
 		"lint": "eslint src --ext .ts",
 		"lintfix": "eslint src --ext .ts --fix",
-		"prepare": "npm run build"
+		"prepare": "npm run build",
+		"prepublishOnly": "npm run lint && npm run build",
+		"release:patch": "./publish.sh patch",
+		"release:minor": "./publish.sh minor",
+		"release:major": "./publish.sh major"
 	},
 	"devDependencies": {
 		"@types/node": "^20.11.24",
