@@ -36,49 +36,6 @@ export class OutlineWebhook implements INodeType {
 				path: 'webhook',
 			},
 		],
-		webhookMethods: {
-			default: {
-				async create(this: IHookFunctions): Promise<boolean> {
-					const webhookUrl = this.getNodeWebhookUrl('default');
-					const events = this.getNodeParameter('events', []) as string[];
-					if (events.length === 0) {
-						return false;
-					}
-
-					const body = {
-						url: webhookUrl,
-						name: `n8n - ${this.getWorkflow().name} - ${this.getNode().name}`,
-						events,
-					};
-
-					const response = await outlineApiRequest.call(this, 'POST', '/webhooks.create', body);
-
-					if (response.data && response.data.id) {
-						this.getWorkflowStaticData('node').webhookId = response.data.id;
-						return true;
-					}
-
-					return false;
-				},
-				async delete(this: IHookFunctions): Promise<boolean> {
-					const webhookData = this.getWorkflowStaticData('node');
-
-					if (webhookData.webhookId) {
-						const body = {
-							id: webhookData.webhookId as string,
-						};
-						try {
-							await outlineApiRequest.call(this, 'POST', '/webhooks.delete', body);
-						} catch (error) {
-							// ignore
-						}
-						delete webhookData.webhookId;
-					}
-
-					return true;
-				},
-			},
-		},
 		properties: [
 			{
 				displayName: 'Events',
@@ -140,6 +97,65 @@ export class OutlineWebhook implements INodeType {
 				description: 'The events to listen for',
 			},
 		],
+	};
+
+	webhookMethods = {
+		default: {
+			async checkExists(this: IHookFunctions): Promise<boolean> {
+				const webhookData = this.getWorkflowStaticData('node');
+				if (webhookData.webhookId) {
+					const endpoint = `/webhooks.info`;
+					try {
+						await outlineApiRequest.call(this, 'POST', endpoint, { id: webhookData.webhookId });
+						return true;
+					} catch (error) {
+						// Webhook does not exist
+						delete webhookData.webhookId;
+						return false;
+					}
+				}
+				return false;
+			},
+			async create(this: IHookFunctions): Promise<boolean> {
+				const webhookUrl = this.getNodeWebhookUrl('default');
+				const events = this.getNodeParameter('events', []) as string[];
+				if (events.length === 0) {
+					return false;
+				}
+
+				const body = {
+					url: webhookUrl,
+					name: `n8n - ${this.getWorkflow().name} - ${this.getNode().name}`,
+					events,
+				};
+
+				const response = await outlineApiRequest.call(this, 'POST', '/webhooks.create', body);
+
+				if (response.data && response.data.id) {
+					this.getWorkflowStaticData('node').webhookId = response.data.id;
+					return true;
+				}
+
+				return false;
+			},
+			async delete(this: IHookFunctions): Promise<boolean> {
+				const webhookData = this.getWorkflowStaticData('node');
+
+				if (webhookData.webhookId) {
+					const body = {
+						id: webhookData.webhookId as string,
+					};
+					try {
+						await outlineApiRequest.call(this, 'POST', '/webhooks.delete', body);
+					} catch (error) {
+						// ignore
+					}
+					delete webhookData.webhookId;
+				}
+
+				return true;
+			},
+		},
 	};
 
 	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
