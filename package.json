@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-outline",
-	"version": "2.0.1",
+	"version": "2.0.2",
 	"description": "n8n community nodes for Outline knowledge base integration with complete API coverage (10 resources, 70+ operations)",
 	"private": false,
 	"main": "dist/index.js",
