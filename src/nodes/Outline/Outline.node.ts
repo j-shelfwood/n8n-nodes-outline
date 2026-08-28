@@ -2269,10 +2269,17 @@ export class Outline implements INodeType {
                 }
 
                 if (Array.isArray(responseData)) {
-                    returnData.push.apply(returnData, responseData as INodeExecutionData[]);
+                    for (const entry of responseData) {
+                        returnData.push({
+                            json: entry as IDataObject,
+                            pairedItem: {
+                                item: i,
+                            },
+                        });
+                    }
                 } else {
                     returnData.push({
-                        json: responseData,
+                        json: responseData as IDataObject,
                         pairedItem: {
                             item: i,
                         },
